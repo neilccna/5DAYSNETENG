@@ -272,6 +272,7 @@ router-id 3.3.3.3
 network 10.1.1.8 0.0.0.3 area 34
 network 10.1.1.4 0.0.0.3 area 0
 
+
 R2:
 config t
 router ospf 1
