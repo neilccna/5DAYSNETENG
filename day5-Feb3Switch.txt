@@ -160,8 +160,8 @@ Config t
 spanning-tree mode pvst
 spanning-tree vlan 1-100 root Primary
 do sh spanning-tree vlan 1
-BABA:/d2
-Config t              32768->   28672
+BABA:/d2   32768->   28672
+Config t              
 spanning-tree mode pvst
 spanning-tree vlan 1-100 root Secondary
 do sh spanning-tree vlan 1
@@ -230,6 +230,14 @@ vtp mode server
 vtp version 2
 exit
 
+a1/a2: Access SW
+config t
+vtp domain ccna
+vtp password pass
+vtp mode server
+vtp version 1
+exit
+
 step2: 
 create vlans:
 TAAS:
@@ -245,6 +253,7 @@ BABA: sh vlan brief:
 cpu1: vlan 11-19
 cpu2: vlan 21-29
 cpu3: vlan 31-39
+
 @TAAs/BABA:
 CONFIG T
 spanning-tree mode Mst
@@ -254,7 +263,7 @@ spanning-tree mst configuration
    Instance 1 vlan 11-19
    Instance 2 vlan 21-29
    Instance 3 vlan 31-39
-exit
+end
 sh spanning-tree mst configuration 
 
 TASK14: MAKE YOUR OWN SUPERMAN BOSSING:
@@ -263,13 +272,17 @@ TASK14: MAKE YOUR OWN SUPERMAN BOSSING:
 @Taas: Make Taas RootBridge again:
 config t
 spanning-tree mst 0 root primary
-spanning-tree mst 1 root primary
+spanning-tree mst 1 root secondary
+spanning-tree mst 2 root primary
+spanning-tree mst 3 root secondary
 @baba
 config t
 spanning-tree mst 0 root Secondary
-spanning-tree mst 1 root Secondary
+spanning-tree mst 1 root primary
+spanning-tree mst 2 root Secondary
+spanning-tree mst 3 root primary
 
-TASK15: Implementing Port-Security in Cisco
+TASK15: Implementing Port-Security in Cisco /bawal nakaw/ bawal palit.
 Switch:
 baba:
 sh cdp nei
@@ -282,13 +295,13 @@ Guard fa0/5 and fa0/7 so that, no Arduino can
 be connected.
 @BABA
 config t
-Int fa0/5
+Int fa0/6
 switchport mode access
 switchport port-security
 switchport port-security mac-address Sticky
 switchport port-security maximum 1
 switchport port-security violation shutdown
-Int fa0/7
+Int fa0/8
 switchport mode access
 switchport port-security
 switchport port-security mac-address Sticky
@@ -301,44 +314,48 @@ do sh int status err-disable
 
 @baba: make it alive:
 config t
-Int fa0/5
+Int fa0/6
 NO switchport port-security
 shut
 no shut
-Int fa0/7
+Int fa0/8
 NO switchport port-security
 shut
 no shut
 
 TASK16: FHRP:First Hop Redundancy Protocol:
-        " The Rich Kid Problem!"
-HSRP: host standby routing protocol: all Cisco SW
+        " The Rich Kid Problem!" = Rich kid solution.
+HSRP: hot standby routing protocol: all Cisco SW 
+   2 or more switches combined to form 1 virtual IP
 VRRP: virtual router redundancy protocol: any brand
 GLBP: global load balancing protocol: all Cisco Router
 Companies: 2 or 3 telcos:
 @TAAS/PLDTinternet:
 config t
+hostname PLDTITO
 Track 1 Int gi 0/1 line-protocol
 Int vlan 1
-standby 1 ip 10.12.1.6
+standby 1 ip 10.22.1.6
 standby 1 preempt
 standby 1 Priority 150
 standby 1 Track 1 decrement 60
 
 @BABA
 config t
+hostname GLOBE
 Int vlan 1
-standby 1 ip 10.12.1.6
+standby 1 ip 10.22.1.6
 standby 1 preempt
 standby 1 Priority 100
 do sh standby
 
 TASK17: Port-Aggregation/Etherchannel:
 LACP:LINK AGGREGATION CONTROL PROTOCOL = ieee
+  cisco = PortAggregationProtocol: PaGP
 Combinding Two/More Layer 2 links AS ONE! Unite/UNITY
 @taas/BABA:
 config t
-Int Range fa0/9-12
+Int Range fa0/10-12
  channel-group 1 mode active
  channel-protocol Lacp
  do sh etherchannel summary
